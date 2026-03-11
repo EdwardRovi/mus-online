@@ -9,31 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MUS">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d0a07'/><text y='75' x='50' font-size='70' text-anchor='middle'>🃏</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<script>
-// Inject PWA web manifest dynamically (works as standalone HTML file)
-(function() {
-  const manifest = {
-    name: 'MUS – Juego de Cartas',
-    short_name: 'MUS',
-    start_url: './',
-    display: 'standalone',
-    background_color: '#0d0a07',
-    theme_color: '#0d0a07',
-    description: 'Juego tradicional vasco de cartas multijugador online',
-    icons: [{
-      src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAABmJLR0QA/wD/AP+gvaeTAAADi0lEQVR42u3BMQEAAADCoPVP7WsIoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAMBuAABHgAAAABJRU5ErkJggg==",
-      sizes: '192x192',
-      type: 'image/png'
-    }]
-  };
-  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-  const link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = URL.createObjectURL(blob);
-  document.currentScript.parentNode.insertBefore(link, document.currentScript);
-})();
-</script>
 <style>
 :root {
   --bg: #0d0a07;
@@ -1252,87 +1229,122 @@ input[type="text"]:focus {
 
 /* ── EXIT BUTTON ── */
 #exit-btn {
-  position: fixed;
-  top: 10px;
-  right: 12px;
-  z-index: 200;
-  background: rgba(0,0,0,0.75);
-  border: 1px solid rgba(180,60,60,0.5);
-  color: rgba(220,120,120,0.9);
+  background: transparent;
+  border: 1px solid rgba(180,60,60,0.4);
+  color: rgba(220,120,120,0.7);
   font-family: 'Cinzel Decorative', cursive;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  padding: 0.3rem 0.7rem;
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
   border-radius: 3px;
   cursor: pointer;
   transition: all 0.15s;
   display: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-#exit-btn:hover {
-  background: rgba(140,30,30,0.6);
-  border-color: rgba(220,80,80,0.7);
-  color: #fff;
-}
-
-/* Exit confirm modal */
+#exit-btn:hover { background: rgba(140,30,30,0.4); border-color: rgba(220,80,80,0.6); color: rgba(255,150,150,0.95); }
 #exit-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.82);
-  z-index: 999;
-  align-items: center;
-  justify-content: center;
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82); z-index: 999;
+  align-items: center; justify-content: center;
 }
 #exit-modal.visible { display: flex; }
 .exit-modal-box {
   background: radial-gradient(ellipse at center, #1a0f04 0%, #0d0a07 100%);
-  border: 1px solid rgba(201,168,76,0.4);
-  border-radius: 6px;
-  padding: 2rem 2.5rem;
-  text-align: center;
-  max-width: 340px;
-  width: 90%;
+  border: 1px solid rgba(201,168,76,0.4); border-radius: 6px;
+  padding: 2rem 2.5rem; text-align: center;
+  max-width: 340px; width: 90%;
   box-shadow: 0 20px 60px rgba(0,0,0,0.9);
   animation: notice-in 0.2s ease;
 }
-.exit-modal-box h3 {
-  font-family: 'Cinzel Decorative', cursive;
-  color: var(--gold);
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.1em;
-}
-.exit-modal-box p {
-  color: rgba(245,234,216,0.65);
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-  font-style: italic;
-}
-.exit-modal-btns {
-  display: flex;
-  gap: 0.8rem;
-  justify-content: center;
-}
+.exit-modal-box h3 { font-family: 'Cinzel Decorative', cursive; color: var(--gold); font-size: 1rem; margin-bottom: 0.5rem; letter-spacing: 0.1em; }
+.exit-modal-box p { color: rgba(245,234,216,0.65); font-size: 0.95rem; margin-bottom: 1.5rem; font-style: italic; }
+.exit-modal-btns { display: flex; gap: 0.8rem; justify-content: center; }
 </style>
+<script>
+// ── PWA MANIFEST (inline, works as static HTML on GitHub Pages) ──
+(function(){
+  const icons = [{
+    src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="80" fill="#0d0a07"/><text y="390" x="256" font-size="380" text-anchor="middle" font-family="serif">🃏</text></svg>'),
+    sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable'
+  }];
+  const manifest = {
+    name: 'MUS – Juego de Cartas',
+    short_name: 'MUS',
+    description: 'Juego tradicional vasco de cartas multijugador online',
+    start_url: './',
+    scope: './',
+    display: 'standalone',
+    orientation: 'any',
+    background_color: '#0d0a07',
+    theme_color: '#0d0a07',
+    categories: ['games'],
+    icons
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+
+  // Service Worker for PWA installability requirement
+  if ('serviceWorker' in navigator) {
+    const swSrc = `
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+self.addEventListener('fetch', e => {
+  if (e.request.url.startsWith('ws') || e.request.method !== 'GET') return;
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+});`;
+    const swBlob = new Blob([swSrc], {type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob), {scope: './'}).catch(()=>{});
+  }
+
+  // Show install prompt banner
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show install banner after short delay
+    setTimeout(() => {
+      if (!deferredPrompt) return;
+      const banner = document.createElement('div');
+      banner.id = 'pwa-install-banner';
+      banner.innerHTML = \`<div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(10,6,3,0.97);border:1px solid rgba(201,168,76,0.5);border-radius:8px;padding:0.8rem 1.2rem;display:flex;align-items:center;gap:0.8rem;box-shadow:0 8px 30px rgba(0,0,0,0.8);max-width:340px;width:92%">
+        <span style="font-size:1.8rem">🃏</span>
+        <div style="flex:1">
+          <div style="font-family:'Cinzel Decorative',cursive;color:#c9a84c;font-size:0.75rem;letter-spacing:0.1em">INSTALAR MUS</div>
+          <div style="color:rgba(245,234,216,0.65);font-size:0.78rem;margin-top:0.15rem">Añadir a pantalla de inicio</div>
+        </div>
+        <button onclick="installPWA()" style="background:linear-gradient(135deg,#a07830,#c9a84c);border:none;color:#1a0f00;font-family:'Cinzel Decorative',cursive;font-size:0.65rem;padding:0.4rem 0.8rem;border-radius:3px;cursor:pointer;letter-spacing:0.05em">INSTALAR</button>
+        <button onclick="document.getElementById('pwa-install-banner').remove()" style="background:none;border:none;color:rgba(245,234,216,0.4);font-size:1.1rem;cursor:pointer;padding:0 0.2rem">✕</button>
+      </div>\`;
+      document.body.appendChild(banner);
+    }, 2000);
+  });
+
+  window.installPWA = async function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.remove();
+  };
+})();
+</script>
 </head>
 <body>
-
-<!-- EXIT BUTTON (visible during game and waiting room) -->
-<button id="exit-btn" onclick="showExitModal()">🚪 Salir partida</button>
-
-<!-- EXIT CONFIRM MODAL -->
 <div id="exit-modal">
   <div class="exit-modal-box">
     <h3>¿Salir de la partida?</h3>
-    <p>Volverás al lobby y podrás unirte a otra sala. Los demás jugadores continuarán sin ti.</p>
+    <p>Volverás al lobby y podrás unirte a otra sala.</p>
     <div class="exit-modal-btns">
       <button class="act-btn act-noquiero" onclick="confirmExit()" style="flex:1">🚪 Salir</button>
       <button class="act-btn act-quiero" onclick="hideExitModal()" style="flex:1">✖ Cancelar</button>
     </div>
   </div>
 </div>
-
 <div id="app">
 
 <!-- Victory overlay -->
@@ -1409,9 +1421,10 @@ input[type="text"]:focus {
           <div class="score-value" id="score0">0</div>
           <div class="round-score" id="rscore0"></div>
         </div>
-        <div style="text-align:center">
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.15rem">
           <div class="phase-display" id="phase-label">—</div>
           <div style="font-size:0.7rem;color:rgba(245,234,216,0.4);margin-top:0.15rem" id="dealer-label"></div>
+          <button id="exit-btn" onclick="showExitModal()">🚪 Salir</button>
         </div>
         <div class="score-team score-team-1" style="text-align:right">
           <div class="round-score" id="rscore1"></div>
@@ -1502,7 +1515,6 @@ function _doConnect(onOpen) {
   };
   ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
   ws.onclose = () => {
-    // Only auto-reconnect if we're in an active session
     if (!myRoom) return;
     _reconnectAttempts++;
     const delay = Math.min(3000 * _reconnectAttempts, 15000);
@@ -1510,7 +1522,7 @@ function _doConnect(onOpen) {
       addLog(`⚠️ Conexión perdida. Reconectando en ${delay/1000}s... (${_reconnectAttempts}/6)`);
       _reconnectTimer = setTimeout(() => _doConnect(_pendingOnOpen), delay);
     } else {
-      addLog('❌ No se pudo reconectar. Usa el botón Salir y vuelve a entrar.');
+      addLog('❌ No se pudo reconectar. Usa Salir e intenta de nuevo.');
     }
   };
   ws.onerror = () => {};
@@ -1607,27 +1619,15 @@ function handleMessage(msg) {
 }
 
 // ─── EXIT LOGIC ──────────────────────────────────────────────────────────────
-function showExitModal() {
-  document.getElementById('exit-modal').classList.add('visible');
-}
-function hideExitModal() {
-  document.getElementById('exit-modal').classList.remove('visible');
-}
+function showExitModal() { document.getElementById('exit-modal').classList.add('visible'); }
+function hideExitModal() { document.getElementById('exit-modal').classList.remove('visible'); }
 function confirmExit() {
   hideExitModal();
-  // Cancel any pending reconnect
   if (_reconnectTimer) { clearTimeout(_reconnectTimer); _reconnectTimer = null; }
-  // Close WebSocket cleanly
   if (ws) { try { ws.close(); } catch(e){} ws = null; }
-  // Reset all state
-  myId = null;
-  myRoom = null;
-  gameState = null;
-  selectedCards.clear();
-  discardSent = false;
-  _reconnectAttempts = 0;
-  _pendingOnOpen = null;
-  // Reset UI back to lobby form
+  myId = null; myRoom = null; gameState = null;
+  selectedCards.clear(); discardSent = false;
+  _reconnectAttempts = 0; _pendingOnOpen = null;
   document.getElementById('game').style.display = 'none';
   document.getElementById('lobby').style.display = 'flex';
   document.getElementById('lobby-form').style.display = 'block';
