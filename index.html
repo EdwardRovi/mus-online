@@ -1227,26 +1227,7 @@ input[type="text"]:focus {
   #listo-btn { font-size: 1rem !important; padding: 0.6rem 1.8rem !important; width: 100%; }
 }
 
-/* ── MODE SELECTOR ── */
-.mode-btn {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(201,168,76,0.25);
-  color: rgba(245,234,216,0.6);
-  font-family: 'Cinzel Decorative', cursive;
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
-  padding: 0.55rem 0.5rem;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.15s;
-  line-height: 1.3;
-}
-.mode-btn-active {
-  background: rgba(201,168,76,0.15);
-  border-color: rgba(201,168,76,0.6);
-  color: var(--gold2);
-}
-.mode-btn:hover { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.4); color: var(--gold); }
+/* ── EXIT BUTTON ── */
 #exit-btn {
   background: transparent;
   border: 1px solid rgba(180,60,60,0.4);
@@ -1383,7 +1364,7 @@ self.addEventListener('fetch', e => {
     <div class="victory-scores" id="v-scores"></div>
     <!-- Listo button RIGHT after scores - visible without scrolling -->
     <div class="victory-listo-area" style="margin:0.8rem 0 0.4rem">
-      <button class="act-btn act-quiero" id="v-listo-btn" onclick="sendListoNuevaPartida()" style="font-size:1.1rem;padding:0.7rem 2rem;width:100%;max-width:320px" id="nueva-partida-btn">🔄 Listo para nueva partida (0/...)</button>
+      <button class="act-btn act-quiero" id="v-listo-btn" onclick="sendListoNuevaPartida()" style="font-size:1.1rem;padding:0.7rem 2rem;width:100%;max-width:320px">🔄 Listo para nueva partida (0/4)</button>
     </div>
     <div id="v-history" class="v-history"></div>
   </div>
@@ -1394,7 +1375,7 @@ self.addEventListener('fetch', e => {
   <div class="title-block">
     <h1>MUS</h1>
     <div class="card-deco">🂡 🂱 🃁 🃑</div>
-    <div class="subtitle">Juego tradicional vasco · 2v2 o 1v1 · 25 tantos</div>
+    <div class="subtitle">Juego tradicional vasco · 4 jugadores · 25 tantos</div>
     <div style="margin-top:0.5rem;font-family:'Crimson Text',serif;font-size:0.8rem;color:rgba(201,168,76,0.45);letter-spacing:0.06em">🌐 mus-online-cydx.onrender.com</div>
   </div>
 
@@ -1403,19 +1384,6 @@ self.addEventListener('fetch', e => {
     <div class="input-group">
       <label>Tu nombre</label>
       <input type="text" id="playerName" placeholder="Ej: Patxi" maxlength="16">
-    </div>
-    <div class="input-group">
-      <label>Modo de juego</label>
-      <div style="display:flex;gap:0.6rem;margin-top:0.2rem">
-        <button id="mode-2v2" onclick="setMode(4)" class="mode-btn mode-btn-active" style="flex:1">
-          👥👥 2v2
-          <div style="font-size:0.65rem;opacity:0.75;margin-top:0.1rem">4 jugadores</div>
-        </button>
-        <button id="mode-1v1" onclick="setMode(2)" class="mode-btn" style="flex:1">
-          👤 1v1
-          <div style="font-size:0.65rem;opacity:0.75;margin-top:0.1rem">2 jugadores</div>
-        </button>
-      </div>
     </div>
     <button class="btn btn-gold" onclick="createRoom()">Crear sala</button>
     <div class="divider">· o ·</div>
@@ -1439,7 +1407,7 @@ self.addEventListener('fetch', e => {
   <div class="lobby-panel" id="lobby-waiting" style="display:none">
     <h2 id="waiting-title">Sala: <span id="room-code-display">----</span></h2>
     <p style="text-align:center; color:rgba(245,234,216,0.6); font-size:0.9rem; margin-bottom:1rem">
-      Comparte este código · Esperando jugadores...
+      Comparte este código con tus compañeros · Esperando 4 jugadores...
     </p>
     <div class="waiting-list" id="waiting-players"></div>
     <div id="waiting-status" class="status-msg">Esperando jugadores...</div>
@@ -1532,15 +1500,8 @@ let ws = null;
 let myId = null;
 let myRoom = null;
 let gameState = null;
-let selectedCards = new Set();
-let discardSent = false;
-let selectedMode = 4; // 2 or 4 players
-
-function setMode(n) {
-  selectedMode = n;
-  document.getElementById('mode-2v2').classList.toggle('mode-btn-active', n === 4);
-  document.getElementById('mode-1v1').classList.toggle('mode-btn-active', n === 2);
-}
+let selectedCards = new Set(); // for discard
+let discardSent = false; // track if this player already confirmed discard
 
 const SUIT_ICON = { oros: '🌞', copas: '🏆', espadas: '⚔️', bastos: '🌿' };
 const SUIT_ES = { oros: 'Oros', copas: 'Copas', espadas: 'Espadas', bastos: 'Bastos' };
@@ -1585,7 +1546,7 @@ function send(msg) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg))
 function createRoom() {
   const name = document.getElementById('playerName').value.trim() || 'Jugador';
   window.myPlayerName = name;
-  connect(() => send({ type: 'createRoom', name, maxPlayers: selectedMode }));
+  connect(() => send({ type: 'createRoom', name }));
 }
 
 function joinRoom() {
@@ -1628,8 +1589,6 @@ function handleMessage(msg) {
   }
 
   if (msg.type === 'nueva_partida_count') {
-    const npBtn = document.getElementById('nueva-partida-btn');
-    if (npBtn) npBtn.textContent = `🔄 Listo para nueva partida (${msg.count}/${msg.total})`;
     const btn = document.getElementById('v-listo-btn');
     if (btn) btn.textContent = `🔄 Listo para nueva partida (${msg.count}/${msg.total})`;
   }
@@ -1702,7 +1661,6 @@ function startGameUI() {
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function renderWaitingRoom(state) {
   const list = document.getElementById('waiting-players');
-  const maxP = state.maxPlayers || 4;
   list.innerHTML = state.players.map(p => `
     <div class="waiting-player team-${p.team}-row">
       <span class="team-badge team-badge-${p.team}">E${p.team+1}</span>
@@ -1710,11 +1668,7 @@ function renderWaitingRoom(state) {
     </div>
   `).join('');
   const n = state.players.length;
-  const modeLabel = maxP === 2 ? '1v1' : '2v2';
-  document.getElementById('waiting-status').textContent = `${n}/${maxP} jugadores conectados · Modo ${modeLabel}`;
-  // Update waiting subtitle
-  const sub = document.querySelector('#lobby-waiting p');
-  if (sub) sub.textContent = `Comparte este código · Esperando ${maxP} jugadores (${modeLabel})...`;
+  document.getElementById('waiting-status').textContent = `${n}/4 jugadores conectados`;
 }
 
 function renderGame(state) {
@@ -1788,44 +1742,36 @@ function renderGame(state) {
       </div>`;
   }
 
-  // ─── LAYOUT: 1v1 vs 2v2 ───
-  const maxP = state.maxPlayers || 4;
-  const is1v1 = maxP === 2;
+  // Teams are 0,1,0,1 (alternating). Partner = idx+2. Rivals = idx+1 and idx+3.
+  // Turn order: 0→1→2→3→0 clockwise on screen = anticlockwise in Mus
+  // From the drawing: looking at the table from below (my position),
+  //   LEFT = idx+1 (next in turn, E1 rival if I'm E0)
+  //   RIGHT = idx+3 (previous in turn, E1 rival if I'm E0)
+  //   TOP = idx+2 (my partner, same team)
+  // Layout: partner across (idx+2), next-in-turn to the RIGHT (idx+1), previous to the LEFT (idx+3)
+  // Example: I am idx0 (dealer). Mano=idx1 is to my RIGHT. idx3 is to my LEFT. idx2 is across.
+  // Turn order anticlockwise: idx1→idx2→idx3→idx0 (right→top→left→me)
+  const partnerIdx = (myIdx + 2) % 4;
+  const rightIdx   = (myIdx + 1) % 4;  // next in turn = RIGHT
+  const leftIdx    = (myIdx + 3) % 4;  // prev in turn = LEFT
 
-  if (is1v1) {
-    // 1v1: only 2 players. idx0=me, idx1=rival. Rival goes on top, no sides.
-    const rivalIdx = myIdx === 0 ? 1 : 0;
-    const rival = state.players[rivalIdx];
-    document.getElementById('opponent-top').innerHTML = rival
-      ? `<div class="partner-label team-warm" style="font-family:'Cinzel Decorative',cursive;font-size:0.55rem;letter-spacing:0.12em">— RIVAL —</div>` + renderPlayerSlot(rival, rivalIdx, false)
-      : '';
-    document.getElementById('opponent-left').innerHTML = '';
-    document.getElementById('opponent-right').innerHTML = '';
-    const mobileRow = document.getElementById('rivals-mobile-row');
-    if (mobileRow) mobileRow.innerHTML = '';
-  } else {
-    // 2v2: partner across, rivals on sides
-    const partnerIdx = (myIdx + 2) % 4;
-    const rightIdx   = (myIdx + 1) % 4;
-    const leftIdx    = (myIdx + 3) % 4;
+  const partner = state.players[partnerIdx];
+  const leftP   = state.players[leftIdx];
+  const rightP  = state.players[rightIdx];
 
-    const partner = state.players[partnerIdx];
-    const leftP   = state.players[leftIdx];
-    const rightP  = state.players[rightIdx];
-
-    const partnerAnimClass = partner ? (partner.team === 0 ? 'team-cold' : 'team-warm') : '';
-    document.getElementById('opponent-top').innerHTML = partner
-      ? `<div class="partner-label ${partnerAnimClass}" style="font-family:'Cinzel Decorative',cursive;font-size:0.55rem;letter-spacing:0.12em">— COMPAÑERO —</div>` + renderPlayerSlot(partner, partnerIdx, false)
-      : '';
-    const leftLabel  = leftP  ? `<div class="side-team-label ${leftP.team === 0 ? 'team-cold' : 'team-warm'}">RIVAL</div>`  : '';
-    const rightLabel = rightP ? `<div class="side-team-label ${rightP.team === 0 ? 'team-cold' : 'team-warm'}">RIVAL</div>` : '';
-    const leftHTML  = leftP  ? leftLabel  + renderPlayerSlot(leftP,   leftIdx,    true)  : '';
-    const rightHTML = rightP ? rightLabel + renderPlayerSlot(rightP,  rightIdx,   true)  : '';
-    document.getElementById('opponent-left').innerHTML  = leftHTML;
-    document.getElementById('opponent-right').innerHTML = rightHTML;
-    const mobileRow = document.getElementById('rivals-mobile-row');
-    if (mobileRow) mobileRow.innerHTML = `<div style="flex:1">${leftHTML}</div><div style="flex:1;text-align:right">${rightHTML}</div>`;
-  }
+  const partnerAnimClass = partner ? (partner.team === 0 ? 'team-cold' : 'team-warm') : '';
+  document.getElementById('opponent-top').innerHTML = partner
+    ? `<div class="partner-label ${partnerAnimClass}" style="font-family:'Cinzel Decorative',cursive;font-size:0.55rem;letter-spacing:0.12em">— COMPAÑERO —</div>` + renderPlayerSlot(partner, partnerIdx, false)
+    : '';
+  const leftLabel  = leftP  ? `<div class="side-team-label ${leftP.team === 0 ? 'team-cold' : 'team-warm'}">RIVAL</div>`  : '';
+  const rightLabel = rightP ? `<div class="side-team-label ${rightP.team === 0 ? 'team-cold' : 'team-warm'}">RIVAL</div>` : '';
+  const leftHTML  = leftP  ? leftLabel  + renderPlayerSlot(leftP,   leftIdx,    true)  : '';
+  const rightHTML = rightP ? rightLabel + renderPlayerSlot(rightP,  rightIdx,   true)  : '';
+  document.getElementById('opponent-left').innerHTML  = leftHTML;
+  document.getElementById('opponent-right').innerHTML = rightHTML;
+  // Mobile: merge both rivals into a single row
+  const mobileRow = document.getElementById('rivals-mobile-row');
+  if (mobileRow) mobileRow.innerHTML = `<div style="flex:1">${leftHTML}</div><div style="flex:1;text-align:right">${rightHTML}</div>`;
 
   // My hand
   const isDiscard = state.phase === 'cambio' && !discardSent && state.discardTurn === myIdx;
@@ -1921,7 +1867,7 @@ function renderActions(state, me, myIdx) {
     if (isMyMusTurn) {
       area.innerHTML = `
         <div class="action-panel">
-          <div class="action-title">¿MUS? — Tu turno (${musCount}/${state.players.length})</div>
+          <div class="action-title">¿MUS? — Tu turno (${musCount}/4)</div>
           <div class="action-buttons">
             <button class="act-btn act-mus" onclick="sendMus()">🔄 Mus</button>
             <button class="act-btn act-nomus" onclick="sendNoMus()">✋ No hay mus</button>
@@ -1929,7 +1875,7 @@ function renderActions(state, me, myIdx) {
         </div>`;
     } else {
       area.innerHTML = `<div class="status-msg">
-        🎴 Turno de <strong class="${musVoteColor}" style="animation-duration:8s">${esc(musVoteName)}</strong> — ¿Mus o no? (${musCount}/${state.players.length})
+        🎴 Turno de <strong class="${musVoteColor}" style="animation-duration:8s">${esc(musVoteName)}</strong> — ¿Mus o no? (${musCount}/4)
       </div>`;
     }
     return;
